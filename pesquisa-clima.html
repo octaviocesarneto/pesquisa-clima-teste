@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#7B1A1A"/>
+  <title>Pesquisa de Clima Organizacional — O'Tools</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{font-family:Arial,sans-serif;font-size:16px;background:#f5f5f3;color:#1a1a1a}
+    .wrap{max-width:520px;margin:0 auto;padding:0 0 2rem;background:#fff;min-height:100vh}
+    .hidden{display:none!important}
+    .header{background:#7B1A1A;color:#F5E6C8;padding:1.25rem 1.25rem 1rem}
+    .header-empresa{font-size:11px;opacity:.75;margin-bottom:2px;letter-spacing:.04em;text-transform:uppercase}
+    .header h1{font-size:17px;font-weight:500;line-height:1.4;margin-bottom:6px}
+    .header p{font-size:13px;opacity:.85;line-height:1.5}
+    .badge{display:inline-block;background:#C8A84B;color:#3A1A00;font-size:11px;padding:4px 10px;border-radius:20px;margin-top:10px;font-weight:500}
+    .setup-screen{padding:1.5rem 1rem}
+    .setup-logo{text-align:center;margin-bottom:1.5rem;font-size:40px}
+    .setup-title{font-size:15px;font-weight:500;margin-bottom:.35rem;text-align:center}
+    .setup-sub{font-size:13px;color:#666;text-align:center;line-height:1.5;margin-bottom:1.5rem}
+    .field-label{font-size:13px;color:#666;margin-bottom:6px;display:block}
+    .field-input{width:100%;padding:.75rem 1rem;border:1px solid #ccc;border-radius:8px;font-size:15px;margin-bottom:1rem;font-family:Arial,sans-serif}
+    .field-input:focus{outline:none;border-color:#7B1A1A}
+    .setup-note{font-size:12px;color:#666;line-height:1.5;background:#f5f5f3;padding:.65rem .85rem;border-radius:8px;margin-top:1rem}
+    .mode-screen{padding:1.25rem 1rem}
+    .empresa-ativa{font-size:13px;color:#666;text-align:center;margin-bottom:1rem;padding:.5rem;background:#f5f5f3;border-radius:8px}
+    .empresa-ativa strong{color:#7B1A1A}
+    .mode-title{font-size:15px;font-weight:500;margin-bottom:1rem}
+    .mode-card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:1rem 1.25rem;margin-bottom:.75rem;cursor:pointer}
+    .mode-card:active{opacity:.7}
+    .mode-card-title{font-size:15px;font-weight:500;margin-bottom:4px}
+    .mode-card-desc{font-size:13px;color:#666;line-height:1.4}
+    .mode-icon{font-size:22px;margin-bottom:8px}
+    .change-empresa{font-size:12px;color:#7B1A1A;text-decoration:underline;cursor:pointer;display:block;text-align:center;margin-top:.5rem;padding:.5rem}
+    .progress-wrap{padding:.75rem 1rem .25rem;background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:10}
+    .progress-info{display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:6px}
+    .progress-bar{height:6px;background:#eee;border-radius:3px}
+    .progress-fill{height:100%;background:#C8A84B;border-radius:3px;transition:width .3s}
+    .body{padding:.75rem 1rem}
+    .dim-header{font-size:11px;font-weight:500;color:#7B1A1A;letter-spacing:.05em;text-transform:uppercase;padding:.75rem 0 .4rem;border-bottom:1.5px solid #C8A84B;margin-bottom:.75rem}
+    .card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:1rem;margin-bottom:.75rem;transition:background .2s,border-color .2s}
+    .card.answered{background:#F0F7EC;border-color:#97C459}
+    .card.answered .q-text{color:#3B6D11}
+    .card.answered .scale-labels{color:#639922}
+    .q-meta{display:flex;align-items:flex-start;gap:8px;margin-bottom:.75rem}
+    .q-num{font-size:11px;font-weight:500;color:#7B1A1A;background:#FAEEDA;border-radius:4px;padding:2px 6px;flex-shrink:0;margin-top:2px;transition:background .2s,color .2s}
+    .card.answered .q-num{background:#C0DD97;color:#27500A}
+    .q-text{font-size:14px;line-height:1.55;transition:color .2s}
+    .scale-wrap{display:flex;flex-direction:column;gap:6px}
+    .scale-labels{display:flex;justify-content:space-between;font-size:11px;color:#999;padding:0 2px;transition:color .2s}
+    .scale-btns{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+    .score-btn{height:44px;border-radius:8px;border:1px solid #ddd;background:#f5f5f3;color:#1a1a1a;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;transition:background .1s,border-color .1s,color .1s;font-family:Arial,sans-serif}
+    .score-btn:active{transform:scale(.94)}
+    .score-btn.active{background:#7B1A1A;border-color:#7B1A1A;color:#F5E6C8}
+    .score-btn.near{background:#F5E6C8;border-color:#C8A84B;color:#3A1A00}
+    .card.answered .score-btn.active{background:#3B6D11;border-color:#3B6D11;color:#fff}
+    .card.answered .score-btn.near{background:#C0DD97;border-color:#639922;color:#27500A}
+    .nav{display:flex;gap:.75rem;padding:.75rem 1rem 0;position:sticky;bottom:0;background:#fff;border-top:1px solid #eee}
+    .btn-primary{flex:2;background:#7B1A1A;color:#F5E6C8;border:none;padding:.85rem 1rem;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;touch-action:manipulation;font-family:Arial,sans-serif}
+    .btn-primary:active{background:#5C1010}
+    .btn-primary:disabled{background:#b48080;cursor:default}
+    .btn-secondary{flex:1;background:#f5f5f3;color:#1a1a1a;border:1px solid #ddd;padding:.85rem 1rem;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;touch-action:manipulation;font-family:Arial,sans-serif}
+    .btn-full{width:100%;background:#f5f5f3;color:#1a1a1a;border:1px solid #ddd;padding:.85rem 1rem;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;touch-action:manipulation;margin-top:.5rem;font-family:Arial,sans-serif}
+    .draft-notice{font-size:12px;color:#3B6D11;background:#EAF3DE;border-radius:8px;padding:.5rem .75rem;margin:.5rem 1rem 0;text-align:center}
+    .thanks-screen{padding:2rem 1.25rem;text-align:center}
+    .thanks-icon{font-size:48px;margin-bottom:1rem}
+    .thanks-title{font-size:18px;font-weight:500;margin-bottom:.5rem}
+    .thanks-text{font-size:14px;color:#666;line-height:1.6;margin-bottom:1.5rem}
+    .results-screen{padding:.75rem 1rem}
+    .manager-header{margin-bottom:1rem}
+    .manager-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+    .manager-title{font-size:15px;font-weight:500}
+    .respondentes-badge{font-size:12px;background:#F5E6C8;color:#7B1A1A;border-radius:20px;padding:4px 10px;font-weight:500}
+    .manager-empresa-label{font-size:12px;color:#666}
+    .manager-empresa-name{font-size:14px;font-weight:500;color:#7B1A1A}
+    .tab-row{display:flex;gap:6px;margin-bottom:1rem;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+    .tab-btn{flex-shrink:0;font-size:13px;padding:.5rem .9rem;border-radius:20px;border:1px solid #ddd;background:#f5f5f3;color:#666;cursor:pointer;touch-action:manipulation;white-space:nowrap;font-family:Arial,sans-serif}
+    .tab-btn.active{background:#7B1A1A;color:#F5E6C8;border-color:#7B1A1A}
+    .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+    .metric{background:#f5f5f3;border-radius:8px;padding:.75rem}
+    .metric-label{font-size:11px;color:#666;margin-bottom:4px}
+    .metric-val{font-size:24px;font-weight:500}
+    .danger{color:#A32D2D}.ok{color:#3B6D11}.warn{color:#BA7517}
+    .legend-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:.75rem}
+    .legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:#666}
+    .legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+    .bar-row{margin-bottom:.75rem}
+    .bar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+    .bar-dim-name{font-size:13px;flex:1;margin-right:8px;line-height:1.4}
+    .bar-score{font-size:14px;font-weight:500;flex-shrink:0}
+    .bar-track{height:14px;background:#eee;border-radius:7px;overflow:hidden}
+    .bar-fill{height:100%;border-radius:7px;transition:width .6s ease}
+    .chart-wrap{position:relative;width:100%;height:280px;margin-bottom:1rem}
+    .critical-box{border-radius:8px;padding:.75rem;margin-bottom:.75rem;border:1px solid #F7C1C1;background:#FCEBEB}
+    .critical-dim{font-size:12px;font-weight:500;color:#791F1F;margin-bottom:.4rem}
+    .critical-item{font-size:13px;color:#A32D2D;padding:3px 0;line-height:1.4;border-top:1px solid #F7C1C1}
+    .critical-item:first-of-type{border-top:none}
+    .critical-note{font-size:12px;color:#BA7517;background:#FAEEDA;border-radius:8px;padding:.6rem .8rem;margin-bottom:.5rem}
+    .empty-ok,.no-data{text-align:center;padding:2rem 1rem;color:#666;font-size:14px}
+    .danger-zone{background:#FCEBEB;border:1px solid #F7C1C1;border-radius:8px;padding:.75rem;margin-top:1rem}
+    .danger-zone-title{font-size:12px;font-weight:500;color:#791F1F;margin-bottom:.4rem}
+    .danger-zone-text{font-size:13px;color:#A32D2D;margin-bottom:.5rem}
+    .reset-danger{background:none;border:1px solid #F7C1C1;color:#A32D2D;border-radius:8px;padding:.6rem 1rem;font-size:13px;cursor:pointer;width:100%;font-family:Arial,sans-serif}
+    .loading{text-align:center;padding:3rem 1rem;color:#666;font-size:14px}
+    .spinner{width:32px;height:32px;border:3px solid #eee;border-top-color:#7B1A1A;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-empresa hidden" id="hdr-empresa"></div>
+    <h1>Pesquisa de Clima Organizacional</h1>
+    <p>Ferramenta de diagnóstico do ambiente de trabalho</p>
+    <span class="badge">O'Tools — Metodologia ADAPT</span>
+  </div>
+
+  <!-- Carregando -->
+  <div id="s-loading">
+    <div class="loading"><div class="spinner"></div>Carregando...</div>
+  </div>
+
+  <!-- Setup -->
+  <div id="s-setup" class="hidden">
+    <div class="setup-screen">
+      <div class="setup-logo">🏢</div>
+      <div class="setup-title">Identificação da empresa</div>
+      <div class="setup-sub">Informe o nome da empresa antes de compartilhar a pesquisa com os colaboradores.</div>
+      <label class="field-label" for="inp-empresa">Nome da empresa</label>
+      <input class="field-input" id="inp-empresa" type="text" placeholder="Ex.: Restaurante Benedito" maxlength="60"/>
+      <button class="btn-primary" style="width:100%" onclick="confirmarEmpresa()">Confirmar e continuar →</button>
+      <div class="setup-note">💡 O nome fica salvo no seu dispositivo. Colaboradores não precisam informar — verão a pesquisa diretamente.</div>
+    </div>
+  </div>
+
+  <!-- Mode -->
+  <div id="s-mode" class="hidden">
+    <div class="mode-screen">
+      <div class="empresa-ativa">Empresa: <strong id="txt-empresa-ativa"></strong></div>
+      <p class="mode-title">Como deseja continuar?</p>
+      <div class="mode-card" onclick="irFormulario()">
+        <div class="mode-icon">📝</div>
+        <div class="mode-card-title">Responder a pesquisa</div>
+        <div class="mode-card-desc">Colaborador — preencha as 20 perguntas de forma anônima</div>
+      </div>
+      <div class="mode-card" onclick="irResultados()">
+        <div class="mode-icon">📊</div>
+        <div class="mode-card-title">Ver resultados consolidados</div>
+        <div class="mode-card-desc">Gestor — visualize o painel com todos os dados coletados</div>
+      </div>
+      <span class="change-empresa" onclick="irSetup()">✏ Alterar empresa</span>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div id="s-form" class="hidden">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="prog-txt">0 de 20 respondidas</span>
+        <span id="prog-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-bar" style="width:0%"></div></div>
+    </div>
+    <div id="draft-notice" class="draft-notice hidden"></div>
+    <div class="body" id="q-container"></div>
+    <div class="nav">
+      <button class="btn-secondary" onclick="irMode()">Voltar</button>
+      <button class="btn-primary" id="btn-enviar" onclick="enviarForm()">Enviar →</button>
+    </div>
+  </div>
+
+  <!-- Thanks -->
+  <div id="s-thanks" class="hidden">
+    <div class="thanks-screen">
+      <div class="thanks-icon">✅</div>
+      <div class="thanks-title">Resposta registrada!</div>
+      <div class="thanks-text" id="txt-thanks">Obrigado pela sua participação.</div>
+      <button class="btn-primary" style="width:100%;margin-bottom:.75rem" onclick="irFormulario()">Responder novamente</button>
+      <button class="btn-full" onclick="irMode()">← Voltar ao início</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="s-results" class="hidden">
+    <div class="results-screen">
+      <div class="manager-header">
+        <div class="manager-top">
+          <span class="manager-title">Painel do Gestor</span>
+          <span class="respondentes-badge" id="badge-resp">—</span>
+        </div>
+        <div class="manager-empresa-label">Empresa</div>
+        <div class="manager-empresa-name" id="txt-empresa-painel"></div>
+      </div>
+      <div id="no-data" class="no-data hidden">Nenhuma resposta registrada ainda.<br>Compartilhe o link da pesquisa com os colaboradores.</div>
+      <div id="res-content" class="hidden">
+        <div class="tab-row">
+          <button class="tab-btn active" onclick="showTab('barras',this)">Barras</button>
+          <button class="tab-btn" onclick="showTab('radar',this)">Radar</button>
+          <button class="tab-btn" onclick="showTab('criticos',this)">Críticos</button>
+          <button class="tab-btn" onclick="showTab('perguntas',this)">Por pergunta</button>
+        </div>
+        <div id="tab-barras">
+          <div class="metric-grid" id="metric-grid"></div>
+          <div class="legend-row">
+            <div class="legend-item"><span class="legend-dot" style="background:#A32D2D"></span>Crítico (&lt;3,0)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#BA7517"></span>Atenção (3–3,9)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#3B6D11"></span>Satisfatório (≥4,0)</div>
+          </div>
+          <div id="bar-section"></div>
+        </div>
+        <div id="tab-radar" class="hidden"><div class="chart-wrap"><canvas id="radarChart"></canvas></div></div>
+        <div id="tab-criticos" class="hidden"><div id="criticos-container"></div></div>
+        <div id="tab-perguntas" class="hidden"><div id="perguntas-container"></div></div>
+      </div>
+      <button class="btn-full" onclick="irMode()">← Voltar</button>
+      <div class="danger-zone">
+        <div class="danger-zone-title">⚠ Área restrita — Gestor</div>
+        <div class="danger-zone-text">Apagar todos os dados coletados reinicia a pesquisa do zero.</div>
+        <button class="reset-danger" onclick="apagarDados()">Apagar todos os dados</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  /* ============================================================
+     🔧 CONFIGURAÇÃO FIREBASE — substitua pelos seus dados
+     Obtenha em: console.firebase.google.com → seu projeto →
+     Configurações do projeto → Seus apps → SDK de configuração
+  ============================================================ */
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDLUiuYwqppdbo4H54DqSEvxL_qiRHo31A",
+    authDomain:        "teste-c9a67.firebaseapp.com",
+    projectId:         "teste-c9a67",
+    storageBucket:     "teste-c9a67.firebasestorage.app",
+    messagingSenderId: "186190623147",
+    appId:             "G-2G2NPL10NB"
+  };
+  /* ============================================================ */
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  window._fbSalvar = async function(respostas, empresa) {
+    await addDoc(collection(db, "respostas"), {
+      empresa,
+      respostas,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  window._fbCarregar = async function(empresa) {
+    const snap = await getDocs(collection(db, "respostas"));
+    return snap.docs
+      .map(d => d.data())
+      .filter(d => d.empresa === empresa)
+      .map(d => d.respostas);
+  };
+
+  window._fbApagar = async function(empresa) {
+    const snap = await getDocs(collection(db, "respostas"));
+    const deletes = snap.docs
+      .filter(d => d.data().empresa === empresa)
+      .map(d => deleteDoc(doc(db, "respostas", d.id)));
+    await Promise.all(deletes);
+  };
+
+  window._fbPronto = true;
+  window.dispatchEvent(new Event('fb-ready'));
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const dims = [
+  {id:'amb',label:'Ambiente de Trabalho'},
+  {id:'rel',label:'Relacionamento e Comunicação'},
+  {id:'eng',label:'Engajamento e Motivação'},
+  {id:'sau',label:'Saúde Emocional e Bem-estar'},
+  {id:'des',label:'Desempenho e Desenvolvimento'},
+  {id:'rem',label:'Remuneração e Benefícios'}
+];
+const questions = [
+  {dim:'amb',text:'As condições físicas do local de trabalho (iluminação, temperatura, espaço) são adequadas.'},
+  {dim:'amb',text:'Tenho acesso aos recursos e ferramentas necessários para realizar meu trabalho com qualidade.'},
+  {dim:'amb',text:'Me sinto seguro(a) no ambiente de trabalho, física e psicologicamente.'},
+  {dim:'rel',text:'Existe comunicação clara e transparente entre líderes e equipes.'},
+  {dim:'rel',text:'Tenho um bom relacionamento com meus colegas de trabalho.'},
+  {dim:'rel',text:'Recebo feedbacks construtivos sobre meu desempenho com regularidade.'},
+  {dim:'eng',text:'Compreendo como meu trabalho contribui para os objetivos da empresa.'},
+  {dim:'eng',text:'Sinto que meu trabalho tem propósito e gera impacto positivo.'},
+  {dim:'eng',text:'Me sinto reconhecido(a) pelo esforço e pelos resultados que entrego.'},
+  {dim:'eng',text:'Tenho orgulho de fazer parte desta empresa.'},
+  {dim:'sau',text:'Consigo manter equilíbrio saudável entre vida profissional e pessoal.'},
+  {dim:'sau',text:'O nível de pressão e estresse no trabalho é gerenciável.'},
+  {dim:'sau',text:'A empresa demonstra genuíno cuidado com o bem-estar emocional dos colaboradores.'},
+  {dim:'des',text:'Minhas metas e responsabilidades são claras e bem definidas.'},
+  {dim:'des',text:'Tenho oportunidades reais de aprendizado e crescimento profissional aqui.'},
+  {dim:'des',text:'Meu gestor me apoia no desenvolvimento da minha carreira.'},
+  {dim:'des',text:'Os processos e fluxos de trabalho são eficientes e bem organizados.'},
+  {dim:'rem',text:'Meu salário é justo em relação às minhas responsabilidades e ao mercado.'},
+  {dim:'rem',text:'Os benefícios oferecidos pela empresa atendem às minhas necessidades.'},
+  {dim:'rem',text:'Me sinto financeiramente valorizado(a) pelo meu desempenho e dedicação.'}
+];
+
+const screens = ['s-loading','s-setup','s-mode','s-form','s-thanks','s-results'];
+let empresa = '';
+let answers = new Array(20).fill(null);
+let radarInst = null;
+let draftTimer = null;
+
+function show(id){
+  screens.forEach(s=>document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+
+function setEmpresa(nome){
+  empresa = nome;
+  const hdr = document.getElementById('hdr-empresa');
+  if(nome){ hdr.textContent=nome; hdr.classList.remove('hidden'); }
+  else hdr.classList.add('hidden');
+  const ta=document.getElementById('txt-empresa-ativa'); if(ta) ta.textContent=nome;
+  const tp=document.getElementById('txt-empresa-painel'); if(tp) tp.textContent=nome;
+}
+
+/* localStorage para empresa e rascunho */
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+
+function irSetup(){ show('s-setup'); document.getElementById('inp-empresa').value=empresa; }
+function irMode(){ show('s-mode'); }
+
+async function irFormulario(){
+  answers = new Array(20).fill(null);
+  const draft = lsGet('otools_draft');
+  if(draft){
+    try{
+      const p=JSON.parse(draft);
+      if(Array.isArray(p)&&p.length===20) answers=p;
+    }catch(e){}
+  }
+  buildForm(); updateProg(); show('s-form');
+}
+
+async function irResultados(){
+  show('s-results');
+  await renderResults();
+}
+
+function confirmarEmpresa(){
+  const val=document.getElementById('inp-empresa').value.trim();
+  if(!val){ alert('Por favor, informe o nome da empresa.'); return; }
+  lsSet('otools_empresa', val);
+  setEmpresa(val);
+  show('s-mode');
+}
+
+function irSetupFn(){ irSetup(); }
+
+function buildForm(){
+  const c=document.getElementById('q-container');
+  c.innerHTML='';
+  let cur='';
+  questions.forEach((q,i)=>{
+    if(q.dim!==cur){
+      cur=q.dim;
+      const dh=document.createElement('div');
+      dh.className='dim-header';
+      dh.textContent=dims.find(d=>d.id===cur).label;
+      c.appendChild(dh);
+    }
+    const card=document.createElement('div');
+    card.className='card'+(answers[i]!==null?' answered':'');
+    card.id='card-'+i;
+    card.innerHTML=`
+      <div class="q-meta"><span class="q-num" id="qn-${i}">${i+1}</span><span class="q-text">${q.text}</span></div>
+      <div class="scale-wrap">
+        <div class="scale-labels"><span>Discordo totalmente</span><span>Concordo totalmente</span></div>
+        <div class="scale-btns">${[0,1,2,3,4,5].map(v=>`<button class="score-btn${answers[i]===v?' active':answers[i]!==null&&Math.abs(v-answers[i])===1?' near':''}" id="b${i}_${v}" onclick="setAns(${i},${v})">${v}</button>`).join('')}</div>
+      </div>`;
+    c.appendChild(card);
+  });
+  updateDraftNotice();
+}
+
+function setAns(qi,val){
+  answers[qi]=val;
+  document.getElementById('card-'+qi).classList.add('answered');
+  [0,1,2,3,4,5].forEach(v=>{
+    const b=document.getElementById(`b${qi}_${v}`);
+    if(!b)return;
+    b.classList.remove('active','near');
+    if(v===val) b.classList.add('active');
+    else if(Math.abs(v-val)===1) b.classList.add('near');
+  });
+  updateProg();
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(()=>{ lsSet('otools_draft',JSON.stringify(answers)); updateDraftNotice(); },800);
+}
+
+function updateProg(){
+  const done=answers.filter(a=>a!==null).length;
+  const pct=Math.round(done/20*100);
+  document.getElementById('prog-bar').style.width=pct+'%';
+  document.getElementById('prog-txt').textContent=`${done} de 20 respondidas`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  const btn=document.getElementById('btn-enviar');
+  if(btn) btn.textContent=done===20?'Enviar →':`Enviar (${done}/20)`;
+}
+
+function updateDraftNotice(){
+  const done=answers.filter(a=>a!==null).length;
+  const el=document.getElementById('draft-notice');
+  if(!el)return;
+  if(done>0&&done<20){
+    el.textContent=`✓ Rascunho salvo — ${done} de 20 respondidas. Você pode retomar depois.`;
+    el.classList.remove('hidden');
+  } else el.classList.add('hidden');
+}
+
+async function enviarForm(){
+  const missing=answers.filter(a=>a===null).length;
+  if(missing>0){
+    alert(`Ainda há ${missing} pergunta(s) sem resposta.\nOs cards sem resposta estão com fundo branco — role a tela para encontrá-los.`);
+    return;
+  }
+  const btn=document.getElementById('btn-enviar');
+  if(btn){ btn.disabled=true; btn.textContent='Salvando...'; }
+  try{
+    await window._fbSalvar([...answers], empresa);
+    lsDel('otools_draft');
+    document.getElementById('txt-thanks').textContent=
+      `Obrigado pela sua participação. Suas respostas foram salvas de forma anônima e contribuirão para a melhoria do ambiente de trabalho em ${empresa}.`;
+    show('s-thanks');
+  } catch(e){
+    alert('Erro ao salvar: '+e.message+'\n\nVerifique a configuração do Firebase.');
+    if(btn){ btn.disabled=false; btn.textContent='Enviar →'; }
+  }
+}
+
+function scoreColor(s){ return s<3?'#A32D2D':s<4?'#BA7517':'#3B6D11'; }
+function scoreClass(s){ return s<3?'danger':s<4?'warn':'ok'; }
+
+async function renderResults(){
+  let all=[];
+  try{ all=await window._fbCarregar(empresa); }catch(e){ all=[]; }
+  const n=all.length;
+  document.getElementById('badge-resp').textContent=`${n} respondente${n!==1?'s':''}`;
+  if(n===0){
+    document.getElementById('no-data').classList.remove('hidden');
+    document.getElementById('res-content').classList.add('hidden');
+    return;
+  }
+  document.getElementById('no-data').classList.add('hidden');
+  document.getElementById('res-content').classList.remove('hidden');
+
+  const avgQ=questions.map((_,i)=>all.reduce((s,r)=>s+r[i],0)/n);
+  const dimScores=dims.map(d=>{
+    const idxs=questions.map((q,i)=>q.dim===d.id?i:-1).filter(i=>i>=0);
+    return{...d,score:idxs.reduce((s,i)=>s+avgQ[i],0)/idxs.length};
+  });
+  const overall=dimScores.reduce((a,b)=>a+b.score,0)/dimScores.length;
+  const critDims=dimScores.filter(s=>s.score<3).length;
+
+  document.getElementById('metric-grid').innerHTML=`
+    <div class="metric"><div class="metric-label">Score geral</div><div class="metric-val ${scoreClass(overall)}">${overall.toFixed(1)}<span style="font-size:14px;font-weight:400"> /5</span></div></div>
+    <div class="metric"><div class="metric-label">Respondentes</div><div class="metric-val">${n}</div></div>
+    <div class="metric"><div class="metric-label">Dim. críticas</div><div class="metric-val ${critDims>0?'danger':'ok'}">${critDims}</div></div>
+    <div class="metric"><div class="metric-label">Dim. OK (≥4)</div><div class="metric-val ok">${dimScores.filter(s=>s.score>=4).length}</div></div>`;
+
+  document.getElementById('bar-section').innerHTML=dimScores.map(s=>{
+    const pct=(s.score/5*100).toFixed(1),col=scoreColor(s.score);
+    return`<div class="bar-row"><div class="bar-top"><span class="bar-dim-name">${s.label}</span><span class="bar-score" style="color:${col}">${s.score.toFixed(2)}</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
+  }).join('');
+
+  const critQs=questions.map((q,i)=>({...q,avg:avgQ[i]})).filter(q=>q.avg<3);
+  const cc=document.getElementById('criticos-container');
+  if(critQs.length===0){
+    cc.innerHTML=`<div class="empty-ok">✓ Nenhuma questão crítica. Todas as médias estão acima de 3,0.</div>`;
+  } else {
+    const byDim=critQs.reduce((acc,q)=>{const dl=dims.find(d=>d.id===q.dim).label;(acc[dl]=acc[dl]||[]).push(q);return acc},{});
+    cc.innerHTML=`<div class="critical-note">⚠ ${critQs.length} questão(ões) com média abaixo de 3,0 — ação prioritária recomendada.</div>`+
+      Object.entries(byDim).map(([dim,items])=>
+        `<div class="critical-box"><div class="critical-dim">${dim}</div>${items.map(it=>`<div class="critical-item">Média ${it.avg.toFixed(2)} — ${it.text}</div>`).join('')}</div>`
+      ).join('');
+  }
+
+  let curDP='';
+  document.getElementById('perguntas-container').innerHTML=questions.map((q,i)=>{
+    const avg=avgQ[i],col=scoreColor(avg),pct=(avg/5*100).toFixed(0);
+    let hdr='';
+    if(q.dim!==curDP){curDP=q.dim;hdr=`<div class="dim-header">${dims.find(d=>d.id===q.dim).label}</div>`;}
+    return`${hdr}<div class="bar-row"><div class="bar-top"><span class="bar-dim-name" style="font-size:12px">${i+1}. ${q.text}</span><span class="bar-score" style="color:${col};font-size:13px">${avg.toFixed(2)}</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${col}"></div></div></div>`;
+  }).join('');
+
+  if(radarInst) radarInst.destroy();
+  radarInst=new Chart(document.getElementById('radarChart'),{
+    type:'radar',
+    data:{
+      labels:dimScores.map(s=>s.label.length>18?s.label.substring(0,16)+'…':s.label),
+      datasets:[{label:'Média',data:dimScores.map(s=>parseFloat(s.score.toFixed(2))),
+        backgroundColor:'rgba(123,26,26,0.15)',borderColor:'#7B1A1A',
+        pointBackgroundColor:'#C8A84B',pointRadius:5,borderWidth:2}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{r:{min:0,max:5,ticks:{stepSize:1,font:{size:10}},pointLabels:{font:{size:10}}}},
+      plugins:{legend:{display:false}}}
+  });
+  showTab('barras',document.querySelector('#s-results .tab-btn'));
+}
+
+async function apagarDados(){
+  if(!confirm(`Tem certeza? Todos os dados de "${empresa}" serão apagados permanentemente.`)) return;
+  try{ await window._fbApagar(empresa); }catch(e){}
+  await renderResults();
+}
+
+function showTab(id,el){
+  ['barras','radar','criticos','perguntas'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('hidden',t!==id);
+  });
+  document.querySelectorAll('#s-results .tab-btn').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+/* Init */
+window.addEventListener('fb-ready', function(){
+  const nome=lsGet('otools_empresa');
+  if(nome){ setEmpresa(nome); document.getElementById('inp-empresa').value=nome; show('s-mode'); }
+  else show('s-setup');
+});
+
+/* Timeout de segurança caso Firebase demore */
+setTimeout(()=>{
+  if(!window._fbPronto){
+    const nome=lsGet('otools_empresa');
+    if(nome){ setEmpresa(nome); document.getElementById('inp-empresa').value=nome; show('s-mode'); }
+    else show('s-setup');
+  }
+},5000);
+</script>
+</body>
+</html>
